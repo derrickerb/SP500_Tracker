@@ -3,25 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>S&P 500 Chart</title>
-</head>
-<body style="margin:0; background:transparent;">
-  <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-    {
-      "symbol": "TVC:SPX",
-      "width": "100%",
-      "height": "100",
-      "locale": "en",
-      "dateRange": "12M",
-      "colorTheme": "dark",
-      "trendLineColor": "#4CAF50",
-      "underLineColor": "#4CAF50",
-      "isTransparent": true,
-      "autosize": false
+  <title>S&P 500 Live Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
-    </script>
-  </div>
+    #chart {
+      width: 90%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>S&P 500 Live Chart</h1>
+  <div id="chart"></div>
+
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+  <script>
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+      layout: {
+        background: { color: '#111' },
+        textColor: '#DDD',
+      },
+      grid: {
+        vertLines: { color: '#333' },
+        horzLines: { color: '#333' },
+      },
+      width: document.getElementById('chart').clientWidth,
+      height: 500,
+    });
+
+    const lineSeries = chart.addLineSeries();
+    const data = [];
+
+    async function fetchPrice() {
+      try {
+        const res = await fetch('https://api.marketdata.app/v1/stocks/quotes/TVC:SPX/');
+        const json = await res.json();
+        const price = json.last;
+        const timestamp = Math.floor(Date.now() / 1000);
+
+        data.push({ time: timestamp, value: price });
+        lineSeries.setData(data);
+      } catch (err) {
+        console.error('Error fetching price:', err);
+      }
+    }
+
+    // Initial fetch and then every 10 seconds
+    fetchPrice();
+    setInterval(fetchPrice, 10000);
+  </script>
 </body>
 </html>

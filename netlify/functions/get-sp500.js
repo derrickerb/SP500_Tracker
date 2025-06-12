@@ -1,6 +1,6 @@
 export async function handler(event, context) {
   const API_KEY = '65020c644abe4c71af390f8c5317f7cb';
-  const url = `https://api.twelvedata.com/time_series?symbol=SPX&interval=1min&outputsize=30&apikey=${API_KEY}`;
+  const url = `https://api.twelvedata.com/time_series?symbol=SPX&interval=365day&outputsize=30&apikey=${API_KEY}`;
 
   try {
     const response = await fetch(url);
